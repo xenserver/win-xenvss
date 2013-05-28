@@ -1,0 +1,26 @@
+HKCR
+{
+	XenVssProvider.XenVssProvider.1 = s 'XenVssProvider Class'
+	{
+		CLSID = s '{B186CF0B-3420-403e-8752-268A74E8295D}'
+	}
+	XenVssProvider.XenVssProvider = s 'XenVssProvider Class'
+	{
+		CLSID = s '{B186CF0B-3420-403e-8752-268A74E8295D}'
+		CurVer = s 'XenVssProvider.XenVssProvider.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B186CF0B-3420-403e-8752-268A74E8295D} = s 'XenVssProvider Class'
+		{
+			ProgID = s 'XenVssProvider.XenVssProvider.1'
+			VersionIndependentProgID = s 'XenVssProvider.XenVssProvider'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{1C8919E4-3E7F-4d03-9AA7-D0EBA7AA5927}'
+		}
+	}
+}

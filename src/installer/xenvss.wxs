@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='windows-1252' ?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+    xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+    >
+
+    <?include verinfo.wxi ?>
+    <?define CurrentMajorVersion = '$(var.BRANDING_MAJOR_VERSION_STR)' ?>
+    <?define CurrentMinorVersion = '$(var.BRANDING_MINOR_VERSION_STR)' ?>
+    <?define CurrentMicroVersion = '$(var.BRANDING_MICRO_VERSION_STR)' ?>
+    <?define CurrentBuildVersion = '$(var.BRANDING_BUILD_NR_STR)' ?>
+
+    <?define UpgradeCode = 'd8709720-65b7-4cd9-9f51-68db592b604d' ?>
+    <?define ProductId = '*' ?>
+    <?if $(var.arch)=x64 ?>
+      <?define ProductId = '*' ?>
+      <?if $(var.type)=Debug ?>
+        <?define source="x64\WindowsVistaDebug" ?>
+      <?else?>
+        <?define source="x64\WindowsVistaRelease" ?>
+      <?endif?>
+    <?else?>
+	  <?if $(var.type)=Debug ?>
+       <?define source="WindowsVistaDebug" ?>
+      <?else?>
+       <?define source="WindowsVistaRelease" ?>
+      <?endif?>
+    <?endif?>
+
+  <Product Name='Citrix XenServer VSS Provider' Id='$(var.ProductId)'
+           Language='1033' Codepage='1252' Version='$(var.CurrentMajorVersion).$(var.CurrentMinorVersion).$(var.CurrentBuildVersion)' Manufacturer='Citrix'
+           UpgradeCode='$(var.UpgradeCode)' >
+    <Package Id='*' Keywords='Citrix XenServer VSS Provider' Description='VSS Provider'
+             Comments='Installs Citrix XenServer VSS Provider' Manufacturer='Citrix'
+             InstallerVersion='200' Languages='1033' Compressed='yes'
+             InstallScope='perMachine'
+             Platform='$(var.arch)'
+             SummaryCodepage='1252' />
+
+   <Icon Id="icon.ico" SourceFile=".\src\installer\xen.ico"/>
+   <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+   <Property Id='ARPSYSTEMCOMPONENT' Value='0'/>
+    <Property Id='FORCEINSTALL' Value='0'/>
+	
+	<CustomAction Id="register_xenvss" Directory="INSTALLDIR" 
+						ExeCommand='"[INSTALLDIR]install-XenProvider.cmd"'
+						/>
+	<CustomAction Id="unregister_xenvss" Directory="INSTALLDIR" 
+						ExeCommand='"[INSTALLDIR]uninstall-XenProvider.cmd"'
+						/>
+						
+	<InstallExecuteSequence>
+	  <Custom Action="register_xenvss" After="InstallFinalize">NOT Installed</Custom>
+	  <Custom Action="unregister_xenvss" Before="InstallInitialize">Installed</Custom>
+	</InstallExecuteSequence>
+
+    <Media Id='1' Cabinet='XenVssInstaller.cab' EmbedCab='yes' />
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder'>
+        <Directory Id='Citrix' Name='Citrix'>
+          <Directory Id='INSTALLDIR' Name='XenTools'>
+              <Component Id='xenvss_component' Guid='*' >
+                  <File Id='xenvss_dll' Name="XenVss.dll" Source='.\proj\$(var.source)\xenvss.dll' />
+				</Component>
+              <Component Id='vssclient_component' Guid='*' >
+                  <File Id='vssclient_dll' Name="VssClient.dll" Source='.\proj\$(var.source)\vssclient.dll' />
+				</Component>
+              <Component Id='install_component' Guid='*' >
+				    <File Id='install_cmd' Name="install-XenProvider.cmd" Source='.\src\xenvss\install-XenProvider.cmd' />
+				</Component>
+              <Component Id='uninstall_component' Guid='*' >
+				    <File Id='uninstall_cmd' Name="uninstall-XenProvider.cmd" Source='.\src\xenvss\uninstall-XenProvider.cmd' />
+				</Component>
+              <Component Id='regvss_component' Guid='*' >
+				    <File Id='regvss_vbs' Name="regvss.vbs" Source='.\src\xenvss\regvss.vbs' />
+			  </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id='Complete' Level='1'>
+        <ComponentRef Id='xenvss_component'/>
+        <ComponentRef Id='vssclient_component'/>
+        <ComponentRef Id='install_component'/>
+        <ComponentRef Id='uninstall_component'/>
+        <ComponentRef Id='regvss_component'/>
+    </Feature>
+  </Product>
+
+
+</Wix>

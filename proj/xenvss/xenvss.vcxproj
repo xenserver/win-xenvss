@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Windows Vista Debug|Win32">
+      <Configuration>Windows Vista Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Windows Vista Release|Win32">
+      <Configuration>Windows Vista Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Windows Vista Debug|x64">
+      <Configuration>Windows Vista Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Windows Vista Release|x64">
+      <Configuration>Windows Vista Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{12C16358-0CB8-55BB-DB42-A12F655D5740}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <ProjectName>xenvss</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Label="PropertySheets">
+    <PlatformToolset>WindowsApplicationForDrivers8.0</PlatformToolset>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <DriverType>WDM</DriverType>
+    <Configuration>Windows Developer Preview Debug</Configuration>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Windows Vista Debug|Win32'" Label="Configuration">
+    <TargetVersion>Vista</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Windows Vista Release|Win32'" Label="Configuration">
+    <TargetVersion>Vista</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Windows Vista Debug|x64'" Label="Configuration">
+    <TargetVersion>Vista</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Windows Vista Release|x64'" Label="Configuration">
+    <TargetVersion>Vista</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Windows Vista Debug'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XENVSS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+	    <Culture>0x0409</Culture>
+	    <AdditionalIncludeDirectories>$(SolutionDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		<PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XENVSS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	</ResourceCompile>
+    <Link>
+      <ModuleDefinitionFile>../../src/xenvss/xenvss.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>$(SolutionDir)..\include\xenvss_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>$(SolutionDir)..\src\xenvss\xenvss_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>$(SolutionDir)..\src\xenvss\xenvss_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(SolutionDir)..\src\xenvss\xenvss.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Windows Vista Release'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XENVSS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+	    <Culture>0x0409</Culture>
+	    <AdditionalIncludeDirectories>$(SolutionDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+		<PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XENVSS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	</ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ModuleDefinitionFile>../../src/xenvss/xenvss.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>$(SolutionDir)..\include\xenvss_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>$(SolutionDir)..\src\xenvss\xenvss_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>$(SolutionDir)..\src\xenvss\xenvss_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(SolutionDir)..\src\xenvss\xenvss.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <FilesToPackage Include="$(TargetPath)" />
+    <FilesToPackage Include="$(OutDir)$(TargetName).pdb" />
+  </ItemGroup>  
+  <ItemGroup>
+    <ClCompile Include="../../src/xenvss/xenvss.cpp" />
+    <ClCompile Include="../../src/xenvss/debug.cpp" />
+    <ClCompile Include="../../src/xenvss/provider.cpp" />
+	<ClCompile Include="../../src/xenvss/interface.cpp" />
+    <ClCompile Include="../../src/xenvss/bytes.cpp" />
+    <ClCompile Include="../../src/xenvss/xenvss_i.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../src/xenvss/xenvss.def" />
+    <None Include="../../src/xenvss/xenvss.rgs" />
+    <None Include="../../src/xenvss/xenvssprov.rgs" />	
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../src/xenvss/xenvss.mc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="../../src/xenvss/xenvss.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="../../src/xenvss/xenvss.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
