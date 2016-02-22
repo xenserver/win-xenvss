@@ -5,6 +5,19 @@ import datetime
 import glob
 import shutil
 import tarfile
+import imp
+
+include = 'include\\'
+define = '#define '
+
+brandingName = 'branding'
+versionName = 'version'
+
+(brandingFile, brandingPath, brandingDesc) = imp.find_module(
+    brandingName, ['src\\' + brandingName])
+
+branding = imp.load_module(
+    brandingName, brandingFile, brandingPath, brandingDesc)
 
 def next_build_number():
     try:
@@ -20,41 +33,42 @@ def next_build_number():
 
     return build_number
 
-
-def make_header():
+def make_version_header():
     now = datetime.datetime.now()
 
-    file = open('include\\version.h', 'w')
-    file.write('#define MAJOR_VERSION\t' + os.environ['MAJOR_VERSION'] + '\n')
-    file.write('#define MAJOR_VERSION_STR\t"' + os.environ['MAJOR_VERSION'] + '"\n')
-    file.write('#define MAJOR_VERSION_WSTR\tL"' + os.environ['MAJOR_VERSION'] + '"\n')
-    file.write('\n')
+    file = open(include + versionName + '.h', 'w')
 
-    file.write('#define MINOR_VERSION\t' + os.environ['MINOR_VERSION'] + '\n')
-    file.write('#define MINOR_VERSION_STR\t"' + os.environ['MINOR_VERSION'] + '"\n')
-    file.write('#define MINOR_VERSION_WSTR\tL"' + os.environ['MINOR_VERSION'] + '"\n')
-    file.write('\n')
+    for ver in ('MAJOR_VERSION', 'MINOR_VERSION',
+                'MICRO_VERSION', 'BUILD_NUMBER'):
+        file.write(
+            define + ver + '\t' + os.environ[ver] + '\n' +
+            define + ver + '_STR\t"' + os.environ[ver] + '"\n' +
+            define + ver + '_WSTR\tL"' + os.environ[ver] + '"\n' +
+            '\n'
+        )
 
-    file.write('#define MICRO_VERSION\t' + os.environ['MICRO_VERSION'] + '\n')
-    file.write('#define MICRO_VERSION_STR\t"' + os.environ['MICRO_VERSION'] + '"\n')
-    file.write('#define MICRO_VERSION_WSTR\tL"' + os.environ['MICRO_VERSION'] + '"\n')
-    file.write('\n')
+    file.write(define + 'YEAR\t' + str(now.year) + '\n')
+    file.write(define + 'YEAR_STR\t"' + str(now.year) + '"\n')
 
-    file.write('#define BUILD_NUMBER\t' + os.environ['BUILD_NUMBER'] + '\n')
-    file.write('#define BUILD_NUMBER_STR\t"' + os.environ['BUILD_NUMBER'] + '"\n')
-    file.write('#define BUILD_NUMBER_WSTR\tL"' + os.environ['BUILD_NUMBER'] + '"\n')
-    file.write('\n')
+    file.write(define + 'MONTH\t' + str(now.month) + '\n')
+    file.write(define + 'MONTH_STR\t"' + str(now.month) + '"\n')
 
-    file.write('#define YEAR\t' + str(now.year) + '\n')
-    file.write('#define YEAR_STR\t"' + str(now.year) + '"\n')
-
-    file.write('#define MONTH\t' + str(now.month) + '\n')
-    file.write('#define MONTH_STR\t"' + str(now.month) + '"\n')
-
-    file.write('#define DAY\t' + str(now.day) + '\n')
-    file.write('#define DAY_STR\t"' + str(now.day) + '"\n')
+    file.write(define + 'DAY\t' + str(now.day) + '\n')
+    file.write(define + 'DAY_STR\t"' + str(now.day) + '"\n')
 
     file.close()
+
+def make_branding_header():
+    file = open(include + brandingName + '.h', 'w')
+
+    for key, value in branding.branding.items():
+        file.write(define + 'BRANDING_' + key + ' "' + value + '"\n')
+
+    file.close()
+
+def make_headers():
+    make_version_header()
+    make_branding_header()
 
 def get_configuration(debug):
     configuration = 'Windows Vista'
@@ -160,7 +174,7 @@ if __name__ == '__main__':
 
     print("BUILD_NUMBER=%s" % os.environ['BUILD_NUMBER'])
 
-    make_header()
+    make_headers()
 
     msbuild('xenvss', 'x86', debug[sys.argv[1]])
     msbuild('xenvss', 'x64', debug[sys.argv[1]])
