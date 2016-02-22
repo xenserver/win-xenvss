@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <ntverp.h>
+#include <branding.h>
 #include "Resource.h"
 
 #undef VER_COMPANYNAME_STR
@@ -38,17 +39,17 @@
 #undef VER_PRODUCTVERSION
 #undef VER_PRODUCTVERSION_STR
 
-#define	VER_COMPANYNAME_STR         "Citrix Systems Inc."
+#define	VER_COMPANYNAME_STR         BRANDING_manufacturerLong
 #define VER_LEGALCOPYRIGHT_STR      "Copyright " YEAR_STR VER_COMPANYNAME_STR
 
 #include <version.h>
 
-#define VER_PRODUCTNAME_STR         "Citrix PV Tools for Virtual Machines"
+#define VER_PRODUCTNAME_STR         BRANDING_pvToolsLong
 #define VER_PRODUCTVERSION          MAJOR_VERSION,MINOR_VERSION,MICRO_VERSION,BUILD_NUMBER
 #define VER_PRODUCTVERSION_STR      MAJOR_VERSION_STR "." MINOR_VERSION_STR "." MICRO_VERSION_STR "." BUILD_NUMBER_STR
 
 #define VER_INTERNALNAME_STR        "XENVSS.DLL"
-#define VER_FILEDESCRIPTION_STR     "Citrix VSS Provider"
+#define VER_FILEDESCRIPTION_STR     BRANDING_vssLong
 
 #define VER_FILETYPE                VFT_DRV
 #define VER_FILESUBTYPE             VFT2_DRV_SYSTEM
