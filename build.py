@@ -6,6 +6,7 @@ import glob
 import shutil
 import tarfile
 import imp
+import subprocess
 
 include = 'include\\'
 define = '#define '
@@ -124,6 +125,20 @@ def archive(name):
     tar.add(name)
     tar.close()
 
+def archive(filename, files, tgz=False):
+    access='w'
+    if tgz:
+        access='w:gz'
+    tar = tarfile.open(filename, access)
+    for name in files :
+        try:
+            print('adding '+name)
+            tar.add(name)
+        except:
+            pass
+    tar.close()
+
+
 def copyfiles(name, arch, debug=False):
 
     configuration=''
@@ -163,6 +178,20 @@ def copyscriptfiles(src, dst):
 	copyfile('uninstall-XenProvider.cmd', src, dst)
 	copyfile('regvss.vbs', src, dst)
 
+
+def callfnout(cmd):
+    print(cmd)
+    print(os.environ['Path'])
+
+    sub = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output = sub.communicate()[0]
+    ret = sub.returncode
+
+    if ret != 0:
+        raise(Exception("Error %d in : %s" % (ret, cmd)))
+    print("------------------------------------------------------------")
+    return output.decode('utf-8')
+
 if __name__ == '__main__':
     debug = { 'checked': True, 'free': False }
 
@@ -181,4 +210,7 @@ if __name__ == '__main__':
     copyfiles('xenvss', 'x86', debug[sys.argv[1]])
     copyfiles('xenvss', 'x64', debug[sys.argv[1]])
     copyscriptfiles(os.sep.join(['src', 'xenvss']), 'xenvss')
-    archive('xenvss')
+
+    listfile = callfnout(['git','ls-files'])
+    archive('xenvss\\source.tgz',listfile.splitlines(), tgz=True)
+    archive('xenvss.tar',['xenvss'])
