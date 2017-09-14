@@ -173,11 +173,38 @@ __IsVdiUuid(
             (Id.m_cbIdentifier == 36 || Id.m_cbIdentifier == 37));
 }
 static __inline bool
+__IsTargetId(
+    const VDS_STORAGE_IDENTIFIER&   Id
+    )
+{
+    return (Id.m_CodeSet == VDSStorageIdCodeSetAscii &&
+            Id.m_Type == VDSStorageIdTypeVendorSpecific &&
+            Id.m_cbIdentifier == 4);
+}
+static __inline bool
 GetVdi(
     const VDS_LUN_INFORMATION&  Lun, 
     GUID*                       Vdi
     ) 
 {
+    for (ULONG i = 0; i < Lun.m_deviceIdDescriptor.m_cIdentifiers; ++i) {
+        const VDS_STORAGE_IDENTIFIER* Id = &Lun.m_deviceIdDescriptor.m_rgIdentifiers[i];
+        if (__IsTargetId(*Id)) {
+            if (Vdi) {
+                try {
+                    XenIfaceItf Store;
+                    string targetid = string((const char*)Id->m_rgbIdentifier, 4);
+                    string frontend = Store.Read("data/scsi/target/" + targetid + "/frontend");
+                    string backend = Store.Read(frontend + "/backend");
+                    string vdiuuid = Store.Read(backend + "/sm-data/vdi-uuid");
+                    *Vdi = Guid(vdiuuid);
+                } catch (...) {
+                    break; // fallback to vdi-uuid Lun identifier
+                }
+            }
+            return true;
+        }
+    }
     for (ULONG i = 0; i < Lun.m_deviceIdDescriptor.m_cIdentifiers; ++i) {
         const VDS_STORAGE_IDENTIFIER* Id = &Lun.m_deviceIdDescriptor.m_rgIdentifiers[i];
         if (__IsVdiUuid(*Id)) {
