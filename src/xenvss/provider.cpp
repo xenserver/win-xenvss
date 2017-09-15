@@ -191,15 +191,30 @@ GetVdi(
         const VDS_STORAGE_IDENTIFIER* Id = &Lun.m_deviceIdDescriptor.m_rgIdentifiers[i];
         if (__IsTargetId(*Id)) {
             if (Vdi) {
+                XenIfaceItf Store;
+
+                string targetid = trim(string((const char*)Id->m_rgbIdentifier, 4));
                 try {
-                    XenIfaceItf Store;
-                    string targetid = string((const char*)Id->m_rgbIdentifier, 4);
-                    string frontend = Store.Read("data/scsi/target/" + targetid + "/frontend");
-                    string backend = Store.Read(frontend + "/backend");
-                    string vdiuuid = Store.Read(backend + "/sm-data/vdi-uuid");
+                    char    path[MAX_PATH];
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "data/scsi/target/%s/frontend",
+                                targetid.c_str());
+                    string frontend = Store.Read(path);
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "%s/backend",
+                                frontend.c_str());
+                    string backend = Store.Read(path);
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "%s/sm-data/vdi-uuid",
+                                backend.c_str());
+                    string vdiuuid = Store.Read(path);
+
                     *Vdi = Guid(vdiuuid);
                 } catch (...) {
-                    break; // fallback to vdi-uuid Lun identifier
+                    Trace("Exception trying to find vdi-uuid for target %s\n", targetid.c_str());
                 }
             }
             return true;
