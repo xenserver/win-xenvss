@@ -44,8 +44,20 @@ typedef std::vector< std::string >  StringVct;
 #include <setupapi.h>
 #pragma comment (lib , "setupapi.lib" )
 
+static void ____DebugPrint(const char* fmt, ...)
+{
+    char    buffer[1024];
+    va_list args;
+
+    va_start(args, fmt);
+    vsprintf_s(buffer, sizeof(buffer)/sizeof(buffer[0]), fmt, args);
+    va_end(args);
+
+    OutputDebugString(buffer);
+}
+
 #ifdef DBG
-#define DebugPrint(x) printf x
+#define DebugPrint(x) ____DebugPrint x
 #else
 #define DebugPrint(x) (VOID)(x)
 #endif
