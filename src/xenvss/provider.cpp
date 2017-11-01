@@ -173,11 +173,53 @@ __IsVdiUuid(
             (Id.m_cbIdentifier == 36 || Id.m_cbIdentifier == 37));
 }
 static __inline bool
+__IsTargetId(
+    const VDS_STORAGE_IDENTIFIER&   Id
+    )
+{
+    return (Id.m_CodeSet == VDSStorageIdCodeSetAscii &&
+            Id.m_Type == VDSStorageIdTypeVendorSpecific &&
+            Id.m_cbIdentifier == 4);
+}
+static __inline bool
 GetVdi(
     const VDS_LUN_INFORMATION&  Lun, 
     GUID*                       Vdi
     ) 
 {
+    for (ULONG i = 0; i < Lun.m_deviceIdDescriptor.m_cIdentifiers; ++i) {
+        const VDS_STORAGE_IDENTIFIER* Id = &Lun.m_deviceIdDescriptor.m_rgIdentifiers[i];
+        if (__IsTargetId(*Id)) {
+            if (Vdi) {
+                XenIfaceItf Store;
+
+                string targetid = trim(string((const char*)Id->m_rgbIdentifier, 4));
+                try {
+                    char    path[MAX_PATH];
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "data/scsi/target/%s/frontend",
+                                targetid.c_str());
+                    string frontend = Store.Read(path);
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "%s/backend",
+                                frontend.c_str());
+                    string backend = Store.Read(path);
+
+                    _snprintf_s(path, sizeof(path), MAX_PATH-1,
+                                "%s/sm-data/vdi-uuid",
+                                backend.c_str());
+                    string vdiuuid = Store.Read(path);
+
+                    *Vdi = Guid(vdiuuid);
+                } catch (...) {
+                    Trace("Exception trying to find vdi-uuid for target %s\n", targetid.c_str());
+                }
+            }
+            return true;
+        }
+    }
     for (ULONG i = 0; i < Lun.m_deviceIdDescriptor.m_cIdentifiers; ++i) {
         const VDS_STORAGE_IDENTIFIER* Id = &Lun.m_deviceIdDescriptor.m_rgIdentifiers[i];
         if (__IsVdiUuid(*Id)) {
